@@ -46,6 +46,22 @@ class BookingApiTest {
     }
 
 
+    @Test
+    void returnsNotFoundForMissingBookingConflict() throws Exception {
+        mockMvc.perform(get("/rooms/room-202/availability?start=2030-01-15T10:15:00&end=2030-01-15T10:45:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.available").value(false));
+
+    }
+
+    @Test
+    void returnsNotFoundForMissingBookingConflict2() throws Exception {
+        mockMvc.perform(get("/rooms/room-202/availability?start=2030-01-15T11:15:00&end=2030-01-15T11:45:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.available").value(true));
+
+    }
+
 
 
 }
