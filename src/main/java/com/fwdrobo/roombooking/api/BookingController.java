@@ -1,14 +1,13 @@
 package com.fwdrobo.roombooking.api;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 
+import com.fwdrobo.roombooking.domain.Booking;
 import com.fwdrobo.roombooking.service.BookingService;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/rooms/{roomId}")
@@ -35,5 +34,16 @@ public class BookingController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end
     ) {
         return new AvailabilityResponse(bookingService.isAvailable(roomId, start, end));
+    }
+
+    @PostMapping("/bookings")
+    public ResponseEntity<BookingResponse> createBooking(
+            @PathVariable String roomId,
+            @RequestBody CreateBookingRequest request
+    ){
+        Booking create =  bookingService.create(roomId,request.start(), request.end());
+        URI location = URI.create("rooms/" +roomId + "/bookings"+create.id() );
+
+        return ResponseEntity.created(location).body(BookingResponse.from(create));
     }
 }
